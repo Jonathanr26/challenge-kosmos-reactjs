@@ -37,48 +37,45 @@ const Component = ({
     // UPDATE HEIGHT AND WIDTH
     const newWidth = e.width;
     const newHeight = e.height;
-
+  
     const positionMaxTop = top + newHeight;
     const positionMaxLeft = left + newWidth;
-
+  
     const parentBounds = parentRef.current.getBoundingClientRect();
-
+  
     let adjustedWidth = newWidth;
     let adjustedHeight = newHeight;
-
-    let translateXAdjusted;
-    let translateYAdjusted;
-
+  
     if (positionMaxTop > parentBounds.height) {
       adjustedHeight = parentBounds.height - top;
+      adjustedWidth = (adjustedHeight / newHeight) * newWidth; // Ajustar el ancho proporcionalmente
     }
     if (positionMaxLeft > parentBounds.width) {
       adjustedWidth = parentBounds.width - left;
+      adjustedHeight = (adjustedWidth / newWidth) * newHeight; // Ajustar el alto proporcionalmente
     }
-
+  
     const beforeTranslate = e.drag.beforeTranslate;
     const translateX = beforeTranslate[0];
     const translateY = beforeTranslate[1];
-
+  
     let adjustedTop = Math.max(top + translateY, 0);
     let adjustedLeft = Math.max(left + translateX, 0);
-
-    if (adjustedTop < 0) {
-      adjustedTop = 0;
-      translateYAdjusted = translateY - translateY;
+  
+    if (adjustedTop + adjustedHeight > parentBounds.height) {
+      adjustedTop = parentBounds.height - adjustedHeight;
     }
-    if (adjustedLeft < 0) {
-      adjustedLeft = 0;
-      translateXAdjusted = translateX - translateX;
+    if (adjustedLeft + adjustedWidth > parentBounds.width) {
+      adjustedLeft = parentBounds.width - adjustedWidth;
     }
-
+  
     const prevWidth = ref.current.offsetWidth;
     const prevHeight = ref.current.offsetHeight;
     const widthRatio = adjustedWidth / prevWidth;
     const heightRatio = adjustedHeight / prevHeight;
-    translateXAdjusted = translateX * widthRatio;
-    translateYAdjusted = translateY * heightRatio;
-
+    const translateXAdjusted = translateX * widthRatio;
+    const translateYAdjusted = translateY * heightRatio;
+  
     updateMoveable(id, {
       top: adjustedTop,
       left: adjustedLeft,
@@ -86,11 +83,11 @@ const Component = ({
       height: adjustedHeight,
       image,
     });
-
+  
     ref.current.style.width = `${adjustedWidth}px`;
     ref.current.style.height = `${adjustedHeight}px`;
     ref.current.style.transform = `translate(${translateXAdjusted}px, ${translateYAdjusted}px)`;
-
+  
     setNodoReferencia({
       ...nodoReferencia,
       translateX: translateXAdjusted,
@@ -99,6 +96,8 @@ const Component = ({
       left: adjustedLeft,
     });
   };
+  
+  
 
   /**
    * Handles the resizing completion event of a Moveable component.
