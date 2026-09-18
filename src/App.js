@@ -12,7 +12,11 @@ const App = () => {
     const response = await fetch("https://jsonplaceholder.typicode.com/photos");
     const data = await response.json();
 
-    const randomImage = data[Math.floor(Math.random() * data.length)].thumbnailUrl;
+    // jsonplaceholder still serves photos, but its thumbnailUrl points at
+    // via.placeholder.com, which is offline. Seed a live image service with the
+    // photo id instead, so each component keeps a unique, stable picture.
+    const photo = data[Math.floor(Math.random() * data.length)];
+    const randomImage = `https://picsum.photos/seed/${photo.id}/300/300`;
 
     setMoveableComponents((prevComponents) => [
       ...prevComponents,
